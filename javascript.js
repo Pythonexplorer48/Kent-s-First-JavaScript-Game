@@ -37,7 +37,6 @@ class Square {
         else if (keys["ArrowDown"]) this.speedy = 4;
         this.x += this.speedx; this.y += this.speedy;
         
-        // Wrap around screen edges
         if (this.x > canvas.width) this.x = -this.size;
         else if (this.x < -this.size) this.x = canvas.width;
         if (this.y > canvas.height) this.y = -this.size;
@@ -100,13 +99,12 @@ function gameloop() {
             if (enemyspawnrate < 5) enemyspawnrate = 5;
         }
     } else {
-        // Game Over Text
         ctx.fillStyle = "red";
         ctx.font = "60px monospace";
         ctx.textAlign = "center";
         ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
         ctx.font = "30px monospace";
-        ctx.fillText("Press F5 to Restart", canvas.width/2, canvas.height/2 + 50);
+        ctx.fillText("Refresh page to retry", canvas.width/2, canvas.height/2 + 50);
     }
 
     for (let i = enemies.length - 1; i >= 0; i--) {
