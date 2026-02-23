@@ -2,7 +2,19 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const keys = {};
 
-window.addEventListener('keydown', (e) => keys[e.key] = true);
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+window.addEventListener('keydown', (e) => {
+    if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+        e.preventDefault();
+    }
+    keys[e.key] = true;
+});
 window.addEventListener('keyup', (e) => keys[e.key] = false);
 
 function checkCollision(rect1, rect2) {
@@ -24,6 +36,8 @@ class Square {
         if (keys["ArrowUp"]) this.speedy = -4;
         else if (keys["ArrowDown"]) this.speedy = 4;
         this.x += this.speedx; this.y += this.speedy;
+        
+        // Wrap around screen edges
         if (this.x > canvas.width) this.x = -this.size;
         else if (this.x < -this.size) this.x = canvas.width;
         if (this.y > canvas.height) this.y = -this.size;
@@ -54,7 +68,7 @@ let timer2 = 0;
 let timer3 = 0;
 let score = 0; 
 let alive = true;
-let enemyspawnrate = 60
+let enemyspawnrate = 60;
 const enemies = [];
 
 function gameloop() {
@@ -71,21 +85,28 @@ function gameloop() {
         timer++;
         timer2++;
         timer3++;
+
         if (timer % enemyspawnrate === 0) {
             const enemY = Math.random() * (canvas.height - 50);
             enemies.push(new Enemy(enemY, 50));
         }
-    }
 
-    if (timer2 % 60 === 0) {
-        score++;
-    }
-
-    if (timer3 % 300 === 0) {
-        enemyspawnrate--
-        if (enemyspawnrate < 5) {
-            enemyspawnrate = 5
+        if (timer2 % 60 === 0) {
+            score++;
         }
+
+        if (timer3 % 300 === 0) {
+            enemyspawnrate--;
+            if (enemyspawnrate < 5) enemyspawnrate = 5;
+        }
+    } else {
+        // Game Over Text
+        ctx.fillStyle = "red";
+        ctx.font = "60px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
+        ctx.font = "30px monospace";
+        ctx.fillText("Press F5 to Restart", canvas.width/2, canvas.height/2 + 50);
     }
 
     for (let i = enemies.length - 1; i >= 0; i--) {
@@ -95,7 +116,6 @@ function gameloop() {
 
         if (alive && checkCollision(square, enemy)) {
             alive = false;
-            console.log(`Game Over! Score: ${score}`);
         }
 
         if (enemy.x < -enemy.size) {
